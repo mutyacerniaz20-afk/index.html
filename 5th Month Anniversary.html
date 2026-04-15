@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Certified Handsome Verification System</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --burnt-orange: #e76f51;
+      --coral:        #f4a261;
+      --warm-sand:    #e9c46a;
+      --deep-teal:    #264653;
+      --bg:           #fdf6ec;
+      --card-bg:      #ffffff;
+      --text-main:    #1a2e38;
+      --text-muted:   #6b7f87;
+      --glow-orange:  rgba(231,111,81,0.28);
+      --glow-coral:   rgba(244,162,97,0.22);
+    }
+
+    html, body { min-height: 100%; }
+
+    body {
+      font-family: 'DM Sans', 'DejaVu Sans', sans-serif;
+      background: linear-gradient(145deg, #fdf6ec 0%, #fde8d0 50%, #fcecd5 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.2rem;
+      color: var(--text-main);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* decorative background blobs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(80px);
+      opacity: 0.35;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, var(--coral), transparent 70%);
+      top: -120px; right: -120px;
+    }
+    body::after {
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, var(--warm-sand), transparent 70%);
+      bottom: -100px; left: -100px;
+    }
+
+    /* ── WRAPPER ── */
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 560px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      text-align: center;
+      margin-bottom: 2.4rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--burnt-orange);
+      background: rgba(231,111,81,0.1);
+      border: 1px solid rgba(231,111,81,0.25);
+      border-radius: 99px;
+      padding: 0.38rem 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    h1 {
+      font-family: 'DM Serif Display', 'DejaVu Serif', serif;
+      font-size: clamp(1.6rem, 5vw, 2.3rem);
+      font-weight: 400;
+      color: var(--deep-teal);
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.6rem;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── MAIN CARD ── */
+    .card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: clamp(2rem, 5vw, 3rem);
+      width: 100%;
+      box-shadow:
+        0 4px 6px rgba(231,111,81,0.06),
+        0 12px 40px rgba(38,70,83,0.1),
+        0 0 0 1px rgba(231,111,81,0.08);
+      transition: box-shadow 0.4s ease;
+    }
+
+    /* ── LANDING STATE ── */
+    #landingView {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.8rem;
+      text-align: center;
+    }
+
+    .face-icon-wrap {
+      position: relative;
+      width: 110px;
+      height: 110px;
+    }
+
+    .face-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px dashed rgba(231,111,81,0.3);
+      animation: spin 12s linear infinite;
+    }
+
+    .face-ring-2 {
+      position: absolute;
+      inset: 10px;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(244,162,97,0.4);
+      animation: spin 8s linear infinite reverse;
+    }
+
+    .face-icon {
+      position: absolute;
+      inset: 18px;
+      background: linear-gradient(135deg, rgba(231,111,81,0.12), rgba(244,162,97,0.18));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.4rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .landing-text h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem;
+      color: var(--deep-teal);
+      margin-bottom: 0.4rem;
+    }
+
+    .landing-text p {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(231,111,81,0.2), transparent);
+    }
+
+    /* specs row */
+    .specs {
+      display: flex;
+      gap: 1.4rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .spec-item {
+      text-align: center;
+    }
+    .spec-val {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--burnt-orange);
+    }
+    .spec-lbl {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-top: 0.15rem;
+    }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, var(--burnt-orange), var(--coral));
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 1rem 2.6rem;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      box-shadow:
+        0 4px 20px var(--glow-orange),
+        0 2px 6px rgba(0,0,0,0.08);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+      -webkit-tap-highlight-color: transparent;
+      width: 100%;
+    }
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px var(--glow-orange), 0 4px 10px rgba(0,0,0,0.1);
+      filter: brightness(1.05);
+    }
+    .btn-primary:active { transform: translateY(0) scale(0.98); }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      background: transparent;
+      color: var(--burnt-orange);
+      border: 1.5px solid rgba(231,111,81,0.4);
+      border-radius: 12px;
+      padding: 0.75rem 1.6rem;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-secondary:hover {
+      background: rgba(231,111,81,0.06);
+      border-color: var(--burnt-orange);
+      transform: translateY(-2px);
+    }
+
+    /* ── SCAN STATE ── */
+    #scanView { display: none; flex-direction: column; gap: 1.6rem; }
+
+    .scan-frame-wrap {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      margin: 0 auto;
+    }
+
+    .scan-frame {
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      background: linear-gradient(145deg, rgba(231,111,81,0.06), rgba(244,162,97,0.1));
+      position: relative;
+      overflow: hidden;
+      border: 1.5px solid rgba(231,111,81,0.25);
+    }
+
+    /* corner brackets */
+    .scan-frame::before, .scan-frame::after,
+    .scan-frame .corner-br, .scan-frame .corner-tl-inner {
+      content: '';
+      position: absolute;
+      width: 22px; height: 22px;
+    }
+    .scan-frame::before {
+      top: -1px; left: -1px;
+      border-top: 3px solid var(--burnt-orange);
+      border-left: 3px solid var(--burnt-orange);
+      border-radius: 6px 0 0 0;
+    }
+    .scan-frame::after {
+      top: -1px; right: -1px;
+      border-top: 3px solid var(--burnt-orange);
+      border-right: 3px solid var(--burnt-orange);
+      border-radius: 0 6px 0 0;
+    }
+    .corner-bl {
+      position: absolute;
+      bottom: -1px; left: -1px;
+      width: 22px; height: 22px;
+      border-bottom: 3px solid var(--burnt-orange);
+      border-left: 3px solid var(--burnt-orange);
+      border-radius: 0 0 0 6px;
+    }
+    .corner-br {
+      position: absolute;
+      bottom: -1px; right: -1px;
+      width: 22px; height: 22px;
+      border-bottom: 3px solid var(--burnt-orange);
+      border-right: 3px solid var(--burnt-orange);
+      border-radius: 0 0 6px 0;
+    }
+
+    /* face silhouette */
+    .face-sil {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      opacity: 0.18;
+    }
+
+    /* scan line */
+    .scan-line {
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--burnt-orange), var(--coral), transparent);
+      box-shadow: 0 0 10px var(--glow-orange);
+      animation: scanMove 1.8s ease-in-out infinite;
+      top: 0;
+    }
+    @keyframes scanMove {
+      0%   { top: 0%; opacity: 1; }
+      50%  { top: 98%; opacity: 1; }
+      100% { top: 0%; opacity: 1; }
+    }
+
+    /* dot grid overlay */
+    .dot-grid {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(231,111,81,0.25) 1px, transparent 1px);
+      background-size: 16px 16px;
+      opacity: 0.5;
+    }
+
+    /* status text */
+    #statusMsg {
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--burnt-orange);
+      min-height: 1.4em;
+      transition: opacity 0.3s ease;
+      letter-spacing: 0.02em;
+    }
+
+    /* progress bar */
+    .progress-wrap {
+      width: 100%;
+    }
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .progress-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    #progressPct {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--burnt-orange);
+    }
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(231,111,81,0.12);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    #progressBar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--burnt-orange), var(--coral), var(--warm-sand));
+      border-radius: 99px;
+      transition: width 0.6s ease;
+      box-shadow: 0 0 8px var(--glow-coral);
+    }
+
+    /* data points */
+    .data-points {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+    .data-chip {
+      background: rgba(231,111,81,0.06);
+      border: 1px solid rgba(231,111,81,0.12);
+      border-radius: 10px;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .data-chip.visible { opacity: 1; transform: none; }
+    .data-chip .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--coral);
+      flex-shrink: 0;
+      animation: pulse 1.2s ease infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.7); }
+    }
+
+    /* ── RESULT STATE ── */
+    #resultView {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.8rem;
+      text-align: center;
+    }
+
+    .result-badge {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--burnt-orange), var(--coral), var(--warm-sand));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      box-shadow: 0 6px 28px var(--glow-orange);
+      animation: badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes badgePop {
+      from { transform: scale(0.3); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    .result-headline {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.2rem, 4vw, 1.7rem);
+      color: var(--deep-teal);
+      line-height: 1.25;
+    }
+    .result-headline span {
+      background: linear-gradient(135deg, var(--burnt-orange), var(--coral));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* stats grid */
+    .stats-grid {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+    .stat-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(231,111,81,0.05);
+      border: 1px solid rgba(231,111,81,0.1);
+      border-radius: 12px;
+      padding: 0.65rem 1rem;
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .stat-row.visible { opacity: 1; transform: none; }
+    .stat-name {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-align: left;
+    }
+    .stat-val {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--burnt-orange);
+      text-align: right;
+      max-width: 55%;
+    }
+
+    .conclusion {
+      font-size: 0.9rem;
+      color: var(--deep-teal);
+      font-style: italic;
+      line-height: 1.6;
+      background: linear-gradient(135deg, rgba(231,111,81,0.07), rgba(233,196,106,0.1));
+      border-left: 3px solid var(--coral);
+      border-radius: 0 12px 12px 0;
+      padding: 0.9rem 1.2rem;
+      text-align: left;
+      width: 100%;
+    }
+
+    .verified-note {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      opacity: 0.7;
+      letter-spacing: 0.04em;
+    }
+    .verified-note strong { color: var(--burnt-orange); }
+
+    .result-actions {
+      display: flex;
+      gap: 0.8rem;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .result-actions .btn-primary { flex: 1; min-width: 140px; }
+    .result-actions .btn-secondary { flex: 1; min-width: 140px; }
+
+    /* ── FADE/SLIDE TRANSITIONS ── */
+    .view { animation: fadeUp 0.5s ease both; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── CERTIFICATE (hidden, used for download) ── */
+    #certTemplate {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="header">
+    <div class="badge">✦ AI-Powered &nbsp;·&nbsp; Certified Technology ✦</div>
+    <h1>Certified Handsome<br>Verification System</h1>
+    <p class="subtitle">Advanced facial analysis for aesthetic excellence</p>
+  </div>
+
+  <div class="card">
+
+    <!-- LANDING -->
+    <div id="landingView" class="view">
+      <div class="face-icon-wrap">
+        <div class="face-ring"></div>
+        <div class="face-ring-2"></div>
+        <div class="face-icon">😎</div>
+      </div>
+
+      <div class="landing-text">
+        <h2>Ready for Analysis</h2>
+        <p>Our proprietary AI will assess your facial structure,<br>charm output, and overall aesthetic excellence.</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="specs">
+        <div class="spec-item">
+          <div class="spec-val">99.9%</div>
+          <div class="spec-lbl">Accuracy</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-val">0.3s</div>
+          <div class="spec-lbl">Scan Time</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-val">ISO 🔥</div>
+          <div class="spec-lbl">Certified</div>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="startBtn">
+        <span>✦</span> Start Scan
+      </button>
+    </div>
+
+    <!-- SCANNING -->
+    <div id="scanView" class="view">
+      <div class="scan-frame-wrap">
+        <div class="scan-frame">
+          <div class="dot-grid"></div>
+          <div class="face-sil">🙂</div>
+          <div class="scan-line"></div>
+          <div class="corner-bl"></div>
+          <div class="corner-br"></div>
+        </div>
+      </div>
+
+      <div id="statusMsg">Initializing scanner...</div>
+
+      <div class="progress-wrap">
+        <div class="progress-top">
+          <span class="progress-label">Analysis Progress</span>
+          <span id="progressPct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div id="progressBar"></div>
+        </div>
+      </div>
+
+      <div class="data-points" id="dataPoints">
+        <div class="data-chip" id="chip0"><span class="dot"></span> Symmetry mapping</div>
+        <div class="data-chip" id="chip1"><span class="dot"></span> Charm calibration</div>
+        <div class="data-chip" id="chip2"><span class="dot"></span> Smile analysis</div>
+        <div class="data-chip" id="chip3"><span class="dot"></span> Aesthetic index</div>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div id="resultView" class="view">
+      <div class="result-badge">🏆</div>
+
+      <div>
+        <div class="result-headline">Face Analysis Complete:<br><span>Dangerously Handsome</span></div>
+      </div>
+
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-row"><span class="stat-name">Handsome Score</span><span class="stat-val">99.98%</span></div>
+        <div class="stat-row"><span class="stat-name">Smile Quality</span><span class="stat-val">Illegal in several countries</span></div>
+        <div class="stat-row"><span class="stat-name">Cuteness Stability</span><span class="stat-val">Extremely High</span></div>
+        <div class="stat-row"><span class="stat-name">Hug Compatibility</span><span class="stat-val">Excellent</span></div>
+        <div class="stat-row"><span class="stat-name">Girlfriend Bias Detected</span><span class="stat-val">Severe ⚠️</span></div>
+        <div class="stat-row"><span class="stat-name">Public Distraction Risk</span><span class="stat-val">High 🚨</span></div>
+      </div>
+
+      <div class="conclusion">
+        🌅 Official conclusion: you are very handsome and very loved.
+      </div>
+
+      <p class="verified-note">Results independently verified by <strong>girlfriend</strong> &nbsp;·&nbsp; Scan ID: #CHV-2025-💛</p>
+
+      <div class="result-actions">
+        <button class="btn-primary" id="downloadBtn">⬇ Download Certificate</button>
+        <button class="btn-secondary" id="scanAgainBtn">↺ Scan Again</button>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+</div><!-- /wrapper -->
+
+<!-- HIDDEN CERTIFICATE TEMPLATE -->
+<div id="certTemplate"></div>
+
+<script>
+  const landingView = document.getElementById('landingView');
+  const scanView    = document.getElementById('scanView');
+  const resultView  = document.getElementById('resultView');
+  const startBtn    = document.getElementById('startBtn');
+  const scanAgainBtn= document.getElementById('scanAgainBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const statusMsg   = document.getElementById('statusMsg');
+  const progressBar = document.getElementById('progressBar');
+  const progressPct = document.getElementById('progressPct');
+  const statsGrid   = document.getElementById('statsGrid');
+
+  const messages = [
+    { text: 'Mapping facial structure...', pct: 14 },
+    { text: 'Measuring charm levels...', pct: 28 },
+    { text: 'Detecting smile quality...', pct: 45 },
+    { text: 'Running advanced attractiveness analysis...', pct: 62 },
+    { text: 'Comparing results against elite standards...', pct: 79 },
+    { text: 'Compiling handsome metrics...', pct: 91 },
+    { text: 'Finalizing report...', pct: 99 },
+  ];
+
+  function show(view) {
+    [landingView, scanView, resultView].forEach(v => {
+      v.style.display = 'none';
+    });
+    view.style.display = 'flex';
+    view.classList.remove('view');
+    void view.offsetWidth;
+    view.classList.add('view');
+  }
+
+  function setProgress(pct) {
+    progressBar.style.width = pct + '%';
+    progressPct.textContent = pct + '%';
+  }
+
+  function setStatus(text) {
+    statusMsg.style.opacity = '0';
+    setTimeout(() => {
+      statusMsg.textContent = text;
+      statusMsg.style.opacity = '1';
+    }, 200);
+  }
+
+  function showChip(i) {
+    const chip = document.getElementById('chip' + i);
+    if (chip) chip.classList.add('visible');
+  }
+
+  async function runScan() {
+    show(scanView);
+    setProgress(0);
+
+    // reset chips
+    for (let i = 0; i < 4; i++) {
+      const c = document.getElementById('chip' + i);
+      if (c) c.classList.remove('visible');
+    }
+
+    const chipTimes = [600, 1800, 3000, 4400];
+    chipTimes.forEach((t, i) => setTimeout(() => showChip(i), t));
+
+    for (let i = 0; i < messages.length; i++) {
+      await delay(i === 0 ? 400 : 900);
+      setStatus(messages[i].text);
+      setProgress(messages[i].pct);
+    }
+
+    await delay(1000);
+    setStatus('✓ Analysis complete!');
+    setProgress(100);
+    await delay(900);
+    showResult();
+  }
+
+  function showResult() {
+    show(resultView);
+
+    // animate stats in one by one
+    const rows = statsGrid.querySelectorAll('.stat-row');
+    rows.forEach(r => r.classList.remove('visible'));
+    rows.forEach((row, i) => {
+      setTimeout(() => row.classList.add('visible'), 200 + i * 120);
+    });
+  }
+
+  function delay(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+
+  startBtn.addEventListener('click', runScan);
+
+  scanAgainBtn.addEventListener('click', () => {
+    show(landingView);
+  });
+
+  downloadBtn.addEventListener('click', () => {
+    const cert = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Certificate of Extreme Handsomeness</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;600;700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #fdf6ec;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 2rem;
+  }
+  .cert {
+    width: 720px; max-width: 100%;
+    background: #fff;
+    border-radius: 24px;
+    padding: 3rem 3.5rem;
+    border: 2px solid #e76f51;
+    box-shadow: 0 8px 48px rgba(231,111,81,0.18);
+    text-align: center;
+    position: relative;
+  }
+  .cert::before, .cert::after {
+    content: '✦';
+    position: absolute;
+    font-size: 1.2rem;
+    color: #f4a261;
+    opacity: 0.5;
+  }
+  .cert::before { top: 1.2rem; left: 1.5rem; }
+  .cert::after  { bottom: 1.2rem; right: 1.5rem; }
+  .seal { font-size: 4rem; margin-bottom: 0.8rem; }
+  .org {
+    font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: #e76f51; font-weight: 700; margin-bottom: 1.6rem;
+  }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem; color: #264653;
+    margin-bottom: 0.4rem;
+  }
+  .sub {
+    font-size: 0.85rem; color: #6b7f87; margin-bottom: 2rem;
+    letter-spacing: 0.04em;
+  }
+  .line { width: 60px; height: 2px; background: linear-gradient(90deg, #e76f51, #e9c46a); margin: 0 auto 2rem; border-radius: 2px; }
+  .body-text { font-size: 1rem; color: #264653; line-height: 1.8; margin-bottom: 2rem; }
+  .body-text strong { color: #e76f51; font-size: 1.15rem; }
+  .stats {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 0.6rem; margin-bottom: 2rem; text-align: left;
+  }
+  .s { background: rgba(231,111,81,0.06); border: 1px solid rgba(231,111,81,0.15);
+       border-radius: 10px; padding: 0.55rem 0.9rem; font-size: 0.78rem; color: #264653; }
+  .s span { font-weight: 700; color: #e76f51; float: right; }
+  .conclusion {
+    font-style: italic; font-size: 0.95rem; color: #264653;
+    background: linear-gradient(135deg, rgba(231,111,81,0.07), rgba(233,196,106,0.1));
+    border-left: 3px solid #f4a261;
+    border-radius: 0 12px 12px 0;
+    padding: 0.9rem 1.2rem; text-align: left;
+    margin-bottom: 2rem;
+  }
+  .footer {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border-top: 1px solid rgba(231,111,81,0.15); padding-top: 1.2rem;
+    font-size: 0.72rem; color: #6b7f87;
+  }
+  .sig { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: #264653; }
+</style>
+</head>
+<body>
+<div class="cert">
+  <div class="seal">🏆</div>
+  <div class="org">Certified Handsome Verification System &nbsp;·&nbsp; Official Registry</div>
+  <h1>Certificate of Extreme Handsomeness</h1>
+  <p class="sub">Issued with full AI authority and zero bias whatsoever</p>
+  <div class="line"></div>
+  <p class="body-text">
+    This certifies that the bearer of this document has been subjected<br>
+    to rigorous facial analysis and has been officially classified as:<br><br>
+    <strong>Dangerously Handsome™</strong>
+  </p>
+  <div class="stats">
+    <div class="s">Handsome Score <span>99.98%</span></div>
+    <div class="s">Smile Quality <span>Illegal</span></div>
+    <div class="s">Cuteness Stability <span>Extreme</span></div>
+    <div class="s">Hug Compatibility <span>Excellent</span></div>
+    <div class="s">Girlfriend Bias <span>Severe ⚠️</span></div>
+    <div class="s">Public Risk <span>High 🚨</span></div>
+  </div>
+  <div class="conclusion">🌅 Official conclusion: you are very handsome and very loved.</div>
+  <div class="footer">
+    <div>
+      <div class="sig">Chief Attractiveness Officer</div>
+      <div>Results verified by girlfriend · Scan ID: #CHV-2025-💛</div>
+    </div>
+    <div style="text-align:right;">
+      <div>Issued: ${new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})}</div>
+      <div style="color:#e76f51;font-weight:700;">CERTIFIED ✦</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>`;
+
+    const blob = new Blob([cert], { type: 'text/html' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'Certified-Handsome-Certificate.html';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+</script>
+</body>
+</html>
